@@ -8,26 +8,32 @@ import (
 var usersRoutes = []Route{
 	{
 		URL:    "/user/create",
-		Method: http.MethodGet,
+		Method: http.MethodPost,
 		Handler: controllers.CreateUser,
 		Authentication: false,
 	},
 	{
-		URL:    "/users/{userId}/update",
+		URL:    "/user/{userId}/update",
 		Method: http.MethodPut,
 		Handler: controllers.UpdateUser,
 		Authentication: false,
 	},
 	{
-		URL:    "/users/{userId}/delete",
+		URL:    "/user/{userId}/delete",
+		Method: http.MethodDelete,
+		Handler: controllers.DeleteUser,
+		Authentication: false,
+	},
+	{
+		URL:    "/user/{userId}/detail",
 		Method: http.MethodGet,
 		Handler: controllers.DeleteUser,
 		Authentication: false,
 	},
 	{
-		URL:    "/users/getAll",
-		Method: http.MethodDelete,
-		Handler: controllers.GetAllUsers,
+		URL:    "/users",
+		Method: http.MethodGet,
+		Handler: controllers.FindAllUsers,
 		Authentication: false,
 	},
 }
