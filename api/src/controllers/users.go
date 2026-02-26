@@ -1,19 +1,42 @@
 package controllers
 
 import (
-	"devbook/database"
-	"fmt"
+	"devbook/src/database"
+	"devbook/src/models"
+	"devbook/src/services"
+	"devbook/src/utils/response"
+	"encoding/json"
+	"io"
 	"net/http"
 )
 
-// CreateUser insert a new user in database.
-func CreateUser(w http.ResponseWriter, r *http.Request) {
-	_, err := database.Connect()
+// SaveUser insert a new user in database.
+func SaveUser(w http.ResponseWriter, r *http.Request) {
+	requestBody, err := io.ReadAll(r.Body)
 	if err != nil {
-		fmt.Println(err)
+		response.ResponseError(w, http.StatusUnprocessableEntity, err)
 	}
-	
-	w.Write([]byte("Creating user."))
+
+	var user models.User
+	if err = json.Unmarshal(requestBody, &user); err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+	}
+
+	databaseConnection, err := database.Connect()
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+	}
+	defer databaseConnection.Close()
+
+	user.ID, err = services.SaveUser(databaseConnection, user)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+	}
+
+	response.ResponseJSON(w, http.StatusCreated, response.Response{
+		Success: true,
+		Data: user,
+	})
 }
 
 // UpdateUser updates a user existing in database.

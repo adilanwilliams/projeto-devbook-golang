@@ -9,7 +9,7 @@ var usersRoutes = []Route{
 	{
 		URL:    "/user/create",
 		Method: http.MethodPost,
-		Handler: controllers.CreateUser,
+		Handler: controllers.SaveUser,
 		Authentication: false,
 	},
 	{

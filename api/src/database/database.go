@@ -14,9 +14,9 @@ func Connect() (*sql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer db.Close()
 
 	if err = db.Ping(); err != nil {
+		defer db.Close()
 		log.Fatal(err)
 	}
 
