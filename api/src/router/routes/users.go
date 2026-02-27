@@ -33,7 +33,7 @@ var usersRoutes = []Route{
 	{
 		URL:    "/users",
 		Method: http.MethodGet,
-		Handler: controllers.FindAllUsers,
+		Handler: controllers.FindUserByNameOrUsername,
 		Authentication: false,
 	},
 }
