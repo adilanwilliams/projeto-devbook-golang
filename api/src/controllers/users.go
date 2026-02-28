@@ -7,19 +7,22 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // SaveUser insert a new user in database.
 func SaveUser(w http.ResponseWriter, r *http.Request) {
-	requestBody, err := io.ReadAll(r.Body)
+	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		response.ResponseError(w, http.StatusUnprocessableEntity, err)
 		return
 	}
 
 	var user models.User
-	if err = json.Unmarshal(requestBody, &user); err != nil {
+	if err = json.Unmarshal(body, &user); err != nil {
 		response.ResponseError(w, http.StatusBadRequest, err)
 		return
 	}
@@ -38,7 +41,37 @@ func SaveUser(w http.ResponseWriter, r *http.Request) {
 
 // UpdateUser updates a user existing in database.
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Updating user."))
+	params := mux.Vars(r)
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		response.ResponseError(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	var user models.User
+	if err := json.Unmarshal(body, &user); err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	user.ID, err = strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = services.UpdateUser(user)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusOK, response.Response{
+		Success: true,
+		Data: user,
+	})
+
 }
 
 // DeleteUser deletes a user existing in database.
@@ -46,9 +79,26 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Deleting user."))
 }
 
-// GetUser returns a user from database.
-func GetUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Getting the users with ID."))
+// FindUserByID returns a user from database.
+func FindUserByID(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	userID, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	user, err := services.FindUserByID(userID)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+
+	}
+	response.ResponseJSON(w, http.StatusOK, response.Response{
+		Success: true,
+		Data:    user,
+	})
 }
 
 // FindUserByNameOrUsername returns a response contant a json with users filtered by name or username.

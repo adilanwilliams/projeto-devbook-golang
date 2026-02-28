@@ -73,4 +73,51 @@ func (repository User) FindUserByNameOrUsername(nameOrUsername string) ([]models
 	return users, nil
 }
 
+func (repository User) FindUserByID(userID uint64) (models.User, error) {
+	rows, err := repository.db.Query(
+		"SELECT id, name, username, email, createdAt FROM users WHERE id = $1",
+		userID,
+	)
+	if err != nil {
+		return models.User{}, err
+	}
+	defer rows.Close()
 
+	var user models.User
+	if rows.Next() {
+		err = rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Username,
+			&user.Email,
+			&user.CreatedAt,
+		)
+
+		if err != nil {
+			return models.User{}, err
+		}
+	}
+
+	return user, nil
+}
+
+func (repository User) UpdateUser(user models.User) error {
+	statment, err := repository.db.Prepare(
+		"UPDATE users SET name = $1, username = $2, email = $3 WHERE id = $4",
+	)
+	if err != nil {
+		return err
+	}
+	
+	_, err = statment.Exec(
+		user.Name,
+		user.Username,
+		user.Email,
+		user.ID,
+	)
+	if err != nil {
+		return err
+	}
+	
+	return nil
+}

@@ -42,4 +42,38 @@ func FindUserByNameOrUsername(nameOrUsername string) ([]models.User, error) {
 	return users, nil
 }
 
+func FindUserByID(userID uint64) (models.User, error) {
+	db, err := database.Connect()
+	if err != nil {
+		return models.User{}, err
+	}
+	defer db.Close()
 
+	userRepository := repositories.NewUserRepository(db)
+
+	user, err := userRepository.FindUserByID(userID)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	return user, nil
+
+}
+
+func UpdateUser(user models.User) error {
+	db, err := database.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	userRepository := repositories.NewUserRepository(db)
+
+	err = userRepository.UpdateUser(user)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}

@@ -27,7 +27,7 @@ var usersRoutes = []Route{
 	{
 		URL:    "/user/{userId}/detail",
 		Method: http.MethodGet,
-		Handler: controllers.DeleteUser,
+		Handler: controllers.FindUserByID,
 		Authentication: false,
 	},
 	{
