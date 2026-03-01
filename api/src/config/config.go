@@ -24,7 +24,7 @@ func Bootstrap(){
 		log.Fatal(erro)
 	}
 
-	Port, erro = strconv.Atoi(os.Getenv("API_POST"))
+	Port, erro = strconv.Atoi(os.Getenv("API_PORT"))
 	if erro != nil{
 		Port = 3030
 	}

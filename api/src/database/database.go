@@ -5,7 +5,7 @@ import (
 	"devbook/src/config"
 	"log"
 
-	_ "github.com/lib/pq" // Databse driver
+	_ "github.com/lib/pq" // Database driver
 )
 
 // Connect returns a connection with database.

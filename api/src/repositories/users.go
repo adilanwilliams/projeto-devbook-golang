@@ -43,7 +43,7 @@ func (repository User) FindUserByNameOrUsername(nameOrUsername string) ([]models
 	nameOrUsername = fmt.Sprintf("%%%s%%", nameOrUsername)
 
 	rows, err := repository.db.Query(
-		"SELECT id, name, username, email, createdAt FROM users WHERE name ILIKE $1 OR username ILIKE $2",
+		"SELECT id, name, username, email, created_at FROM users WHERE name ILIKE $1 OR username ILIKE $2",
 		nameOrUsername,
 		nameOrUsername,
 	)
@@ -75,7 +75,7 @@ func (repository User) FindUserByNameOrUsername(nameOrUsername string) ([]models
 
 func (repository User) FindUserByID(userID uint64) (models.User, error) {
 	rows, err := repository.db.Query(
-		"SELECT id, name, username, email, createdAt FROM users WHERE id = $1",
+		"SELECT id, name, username, email, created_at FROM users WHERE id = $1",
 		userID,
 	)
 	if err != nil {
@@ -119,5 +119,23 @@ func (repository User) UpdateUser(user models.User) error {
 		return err
 	}
 	
+	return nil
+}
+
+func (repository User) DeleteUser(userID uint64) error {
+	statment, err := repository.db.Prepare(
+		"DELETE FROM users WHERE id = $1",
+	)
+	if err != nil {
+		return  err
+	}
+
+	_, err = statment.Exec(
+		userID,
+	)
+	if err != nil {
+		return  err
+	}
+
 	return nil
 }

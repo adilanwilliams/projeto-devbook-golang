@@ -77,3 +77,21 @@ func UpdateUser(user models.User) error {
 	return nil
 
 }
+
+func DeleteUser(userID uint64) error {
+	db, err := database.Connect()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+
+	userRepository := repositories.NewUserRepository(db)
+
+	err = userRepository.DeleteUser(userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}

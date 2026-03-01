@@ -69,14 +69,31 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	response.ResponseJSON(w, http.StatusOK, response.Response{
 		Success: true,
-		Data: user,
+		Data:    user,
 	})
 
 }
 
 // DeleteUser deletes a user existing in database.
 func DeleteUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Deleting user."))
+	params := mux.Vars(r)
+	var userID uint64
+
+	userID, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	err = services.DeleteUser(userID)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusOK, response.Response{
+		Success: true,
+	})
 }
 
 // FindUserByID returns a user from database.
