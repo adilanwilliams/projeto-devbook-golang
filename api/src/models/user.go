@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-// User represent a user in database.
+// User represents a user entity stored in the database.
 type User struct {
 	ID        uint64    `json:"id,omitempty"`
 	Name      string    `json:"name,omitempty"`
@@ -16,7 +16,7 @@ type User struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
-// Prepare valida and formating the user.
+// Prepare validates and formats the user data before persistence.
 func (u *User) Prepare() error {
 	if err := u.validate(); err != nil {
 		return err

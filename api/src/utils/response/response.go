@@ -6,26 +6,28 @@ import (
 	"net/http"
 )
 
-// Response represents a response for API.
+// Response defines the standard structure for API responses.
 type Response struct {
-	Success bool   `json:"success"`
-	Data interface{} `json:"data"`
+	Success bool        `json:"success"`
+	Data    interface{} `json:"data"`
 }
 
-// ResponseJSON returns a response JSON for the requests.
+// ResponseJSON writes a JSON response to the client
+// with the provided HTTP status code.
 func ResponseJSON(w http.ResponseWriter, statusCode int, response Response) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(statusCode)
 
-	if err := json.NewEncoder(w).Encode(response); err != nil{
+	if err := json.NewEncoder(w).Encode(response); err != nil {
 		log.Fatal(err)
 	}
 }
 
-// ResponseJSON returns a response JSON for the errors on requests.
+// ResponseError writes an error response in JSON format
+// using the standard Response structure.
 func ResponseError(w http.ResponseWriter, statusCode int, err error) {
 	ResponseJSON(w, statusCode, Response{
 		Success: false,
-		Data: err.Error(),
+		Data:    err.Error(),
 	})
 }

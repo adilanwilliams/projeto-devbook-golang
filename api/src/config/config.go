@@ -17,15 +17,18 @@ var (
 	ConnectionStringPGDatabase = ""
 )
 
-func Bootstrap(){
+// Bootstrap loads environment variables and initializes
+// application configuration values such as API port and
+// PostgreSQL connection string.
+func Bootstrap() {
 	var erro error
 
-	if erro = godotenv.Load(); erro != nil{
+	if erro = godotenv.Load(); erro != nil {
 		log.Fatal(erro)
 	}
 
 	Port, erro = strconv.Atoi(os.Getenv("API_PORT"))
-	if erro != nil{
+	if erro != nil {
 		Port = 3030
 	}
 

@@ -6,7 +6,9 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// Route represent the routes from API
+// Route defines the structure of an API route,
+// including its URL, HTTP method, handler function,
+// and whether authentication is required.
 type Route struct {
 	URL            string
 	Method         string
@@ -14,6 +16,8 @@ type Route struct {
 	Authentication bool
 }
 
+// Bootstrap registers all application routes into the provided mux router
+// and returns the configured router instance.
 func Bootstrap(router *mux.Router) *mux.Router {
 	routes := usersRoutes
 

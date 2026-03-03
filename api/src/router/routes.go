@@ -6,7 +6,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// CreateRouter returns a new mux router instance.
+// CreateRoute initializes a new mux router,
+// registers all application routes, and returns the configured router instance.
 func CreateRoute() *mux.Router {
 	router := mux.NewRouter()
 	return routes.Bootstrap(router)
