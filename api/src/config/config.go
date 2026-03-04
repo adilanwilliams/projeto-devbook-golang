@@ -15,6 +15,9 @@ var (
 
 	// ConnectionStringPGDatabase is the string connection with PostgreeSql database.
 	ConnectionStringPGDatabase = ""
+	
+	// SecretKey is the application's secret key used to sign and validate JWT tokens.
+	SecretKey []byte
 )
 
 // Bootstrap loads environment variables and initializes
@@ -40,4 +43,6 @@ func Bootstrap() {
 		os.Getenv("PG_DATABASE_PASSWORD"),
 		os.Getenv("PG_DATABASE_NAME"),
 	)
+
+	SecretKey = []byte(os.Getenv("SECRET_KEY"))
 }

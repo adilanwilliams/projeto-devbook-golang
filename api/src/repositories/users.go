@@ -21,15 +21,13 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 func (repository UserRepository) Save(user models.User) (uint64, error) {
 	var id uint64
 
-	err := repository.db.
-		QueryRow(
-			"INSERT INTO users (name, username, email, password) VALUES ($1, $2, $3, $4) RETURNING id",
-			user.Name,
-			user.Username,
-			user.Email,
-			user.Password,
-		).
-		Scan(&id)
+	err := repository.db.QueryRow(
+		"INSERT INTO users (name, username, email, password) VALUES ($1, $2, $3, $4) RETURNING id",
+		user.Name,
+		user.Username,
+		user.Email,
+		user.Password,
+	).Scan(&id)
 
 	if err != nil {
 		return 0, err
@@ -150,4 +148,28 @@ func (repository UserRepository) DeleteUser(userID uint64) error {
 
 	repository.db.Close()
 	return nil
+}
+
+// FindByEmail retrieves a user by its unique E-mail.
+// It returns the user if found, or an empty User and error otherwise.
+func (repository UserRepository) FindByEmail(email string) (models.User, error) {
+	var user models.User
+
+	rows, err := repository.db.Query(
+		"SELECT id, password FROM users WHERE email = $1",
+		email,
+	)
+	if err != nil {
+		return models.User{}, err
+	}
+
+	if rows.Next() {
+		err = rows.Scan(&user.ID, &user.Password)
+		if err != nil {
+			return models.User{}, err
+		}
+	}
+	repository.db.Close()
+
+	return user, nil
 }

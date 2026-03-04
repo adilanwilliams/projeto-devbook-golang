@@ -1,9 +1,12 @@
 package models
 
 import (
+	"devbook/src/security"
 	"errors"
 	"strings"
 	"time"
+
+	"github.com/badoux/checkmail"
 )
 
 // User represents a user entity stored in the database.
@@ -16,17 +19,27 @@ type User struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 }
 
+// UserModeCreation mode creation of validate
+var UserModeCreation = "creation"
+
+// UserModeCreation mode updating of validate
+var UserModeUpdating = "updating"
+
 // Prepare validates and formats the user data before persistence.
-func (u *User) Prepare() error {
-	if err := u.validate(); err != nil {
+func (u *User) Prepare(mode string) error {
+	err := u.validate(mode)
+	if err != nil {
 		return err
 	}
 
-	u.format()
+	err = u.format(mode)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
-func (u User) validate() error {
+func (u User) validate(mode string) error {
 	if u.Name == "" {
 		return errors.New("Name is required.")
 	}
@@ -35,18 +48,35 @@ func (u User) validate() error {
 		return errors.New("Email is required.")
 	}
 
+	err := checkmail.ValidateFormat(u.Email)
+	if err != nil {
+		return err
+	}
+
 	if u.Username == "" {
 		return errors.New("Username is required.")
 	}
 
-	if u.Password == "" {
+	if u.Password == "" && mode == UserModeCreation {
 		return errors.New("Password is required.")
 	}
 
 	return nil
 }
 
-func (u *User) format() {
+func (u *User) format(mode string) error {
 	u.Name = strings.TrimSpace(u.Name)
 	u.Email = strings.TrimSpace(u.Email)
+	u.Username = strings.TrimSpace(u.Username)
+
+	if mode == UserModeCreation {
+		passwordHashed, err := security.Hash(u.Password)
+		if err != nil {
+			return err
+		}
+
+		u.Password = string(passwordHashed)
+	}
+
+	return nil
 }
