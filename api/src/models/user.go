@@ -44,6 +44,14 @@ func (u User) validate(mode string) error {
 		return errors.New("Name is required.")
 	}
 
+	if u.Username == "" {
+		return errors.New("Username is required.")
+	}
+
+	if u.Password == "" && mode == UserModeCreation {
+		return errors.New("Password is required.")
+	}
+
 	if u.Email == "" {
 		return errors.New("Email is required.")
 	}
@@ -51,14 +59,6 @@ func (u User) validate(mode string) error {
 	err := checkmail.ValidateFormat(u.Email)
 	if err != nil {
 		return err
-	}
-
-	if u.Username == "" {
-		return errors.New("Username is required.")
-	}
-
-	if u.Password == "" && mode == UserModeCreation {
-		return errors.New("Password is required.")
 	}
 
 	return nil

@@ -10,7 +10,6 @@ import (
 	"net/http"
 )
 
-
 // Login handles user authentication requests.
 func Login(w http.ResponseWriter, r *http.Request) {
 	body, err := io.ReadAll(r.Body)

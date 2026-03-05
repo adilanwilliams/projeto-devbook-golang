@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"devbook/src/middlewares"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -25,7 +26,19 @@ func Bootstrap(router *mux.Router) *mux.Router {
 	routes = append(routes, loginRoute)
 
 	for _, route := range routes {
-		router.HandleFunc(route.URL, route.Handler).Methods(route.Method)
+		if route.Authentication {
+			router.
+				HandleFunc(
+					route.URL,
+					middlewares.
+						Logger(middlewares.Authentication(route.Handler))).
+				Methods(route.Method)
+			continue
+		}
+
+		router.
+			HandleFunc(route.URL, middlewares.Logger(route.Handler)).
+			Methods(route.Method)
 	}
 
 	return router

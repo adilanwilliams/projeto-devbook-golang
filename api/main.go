@@ -12,8 +12,6 @@ func main() {
 	config.Bootstrap()
 	router := router.CreateRoute()
 
-	fmt.Println(config.SecretKey)
-
 	fmt.Printf("Server listining on port %d\n", config.Port)
 	erro := http.ListenAndServe(fmt.Sprintf(":%d", config.Port), router)
 	if erro != nil {

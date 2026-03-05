@@ -10,7 +10,7 @@ var usersRoutes = []Route{
 		URL:            "/user/create",
 		Method:         http.MethodPost,
 		Handler:        controllers.SaveUser,
-		Authentication: false,
+		Authentication: true,
 	},
 	{
 		URL:            "/user/{userId}/update",
@@ -28,7 +28,7 @@ var usersRoutes = []Route{
 		URL:            "/user/{userId}/detail",
 		Method:         http.MethodGet,
 		Handler:        controllers.FindUserByID,
-		Authentication: false,
+		Authentication: true,
 	},
 	{
 		URL:            "/users",
