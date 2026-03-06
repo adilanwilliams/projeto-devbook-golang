@@ -30,8 +30,9 @@ func Bootstrap(router *mux.Router) *mux.Router {
 			router.
 				HandleFunc(
 					route.URL,
-					middlewares.
-						Logger(middlewares.Authentication(route.Handler))).
+					middlewares.Logger(
+					middlewares.Authentication(
+					middlewares.AuthenticationUserID(route.Handler)))).
 				Methods(route.Method)
 			continue
 		}

@@ -49,6 +49,12 @@ func SaveUser(w http.ResponseWriter, r *http.Request) {
 func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
+	userID, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		response.ResponseError(w, http.StatusUnprocessableEntity, err)
@@ -60,12 +66,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		response.ResponseError(w, http.StatusBadRequest, err)
 		return
 	}
-
-	user.ID, err = strconv.ParseUint(params["userId"], 10, 64)
-	if err != nil {
-		response.ResponseError(w, http.StatusBadRequest, err)
-		return
-	}
+	user.ID = userID
 
 	service, err := services.NewUserService()
 	if err != nil {
@@ -81,7 +82,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 
 	response.ResponseJSON(w, http.StatusOK, response.Response{
 		Success: true,
-		Data:    user,
+		Data:    userID,
 	})
 
 }
@@ -163,3 +164,5 @@ func FindUserByNameOrUsername(w http.ResponseWriter, r *http.Request) {
 		Data:    users,
 	})
 }
+
+

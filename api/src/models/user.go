@@ -39,6 +39,17 @@ func (u *User) Prepare(mode string) error {
 	return nil
 }
 
+func (u *User) IsEmpty() bool {
+	if u.ID == 0 &&
+		u.Name == "" &&
+		u.Username == "" &&
+		u.Email == "" &&
+		u.Password == "" {
+			return true
+	}
+	return false
+}
+
 func (u User) validate(mode string) error {
 	if u.Name == "" {
 		return errors.New("Name is required.")

@@ -5,6 +5,7 @@ import (
 	"devbook/src/models"
 	"devbook/src/repositories"
 	"devbook/src/security"
+	"errors"
 )
 
 // UserService provides business logic related to users.
@@ -97,6 +98,10 @@ func (service UserService) Login(password, email string) (uint64, error) {
 	user, err := service.UserRepository.FindByEmail(email)
 	if err != nil {
 		return 0, err
+	}
+
+	if user.IsEmpty() {
+		return 0, errors.New("Access invalid.")
 	}
 
 	err = security.ValidatePassword(user.Password, password)
