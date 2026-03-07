@@ -175,12 +175,10 @@ func (repository UserRepository) FindByEmail(email string) (models.User, error) 
 }
 
 // FollowUser creates a follow relationship between two users.
-// It inserts a record into the follows table using the ID of the
-// follower (userID) and the ID of the user being followed (followID).
 // It returns an error if the insert operation fails.
 func (repository UserRepository) FollowUser(followID, userID uint64) error {
 	statment, err := repository.db.Prepare(
-		"INSERT IGNORE INTO follows (user_id, follow_id) VALUES ($1, $2);",
+		"INSERT INTO follows (user_id, follow_id) VALUES ($1, $2) ON CONFLICT DO NOTHING",
 	)
 	if err != nil {
 		return err
@@ -194,3 +192,23 @@ func (repository UserRepository) FollowUser(followID, userID uint64) error {
 
 	return nil
 }
+
+// UnfollowUser removes a follow relationship between two users.
+// It returns an error if the delete operation fails.
+func (repository UserRepository) UnfollowUser(followID, userID uint64) error {
+	statment, err := repository.db.Prepare(
+		"DELETE FROM follows WHERE user_id = $1 AND follow_id = $2",
+	)
+	if err != nil {
+		return err
+	}
+	defer statment.Close()
+
+	_, err = statment.Exec(userID, followID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+

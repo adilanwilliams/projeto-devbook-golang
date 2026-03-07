@@ -180,8 +180,6 @@ func FindUserByNameOrUsername(w http.ResponseWriter, r *http.Request) {
 
 // FollowUser creates a follow relationship between the authenticated user
 // and the user identified by userId in the request URL.
-// It prevents a user from following themselves and returns an error
-// if the operation fails.
 func FollowUser(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
@@ -209,7 +207,41 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.ResponseJSON(w, http.StatusNoContent, response.Response{
+	response.ResponseJSON(w, http.StatusOK, response.Response{
+		Success: true,
+	})
+}
+
+// UnfollowUser removes a follow relationship between the authenticated user
+// and the user identified by userId in the request URL.
+func UnfollowUser(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	userID, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	followID := r.Context().Value("userID").(uint64)
+	if followID == userID {
+		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
+		return
+	}
+
+	service, err := services.NewUserService()
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	err = service.UnfollowUser(followID, userID)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusOK, response.Response{
 		Success: true,
 	})
 }
