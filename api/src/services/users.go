@@ -121,3 +121,17 @@ func (service UserService) FollowUser(followID, userID uint64) error {
 func (service UserService) UnfollowUser(followID, userID uint64) error {
 	return service.UserRepository.UnfollowUser(followID, userID)
 }
+
+// FindUserFollows retrieves the users that a given user is following.
+// It returns a slice of users followed by the specified user ID,
+// or an error if the query execution fails.
+func (service UserService) FindUserFollows(userID uint64) ([]models.User, error) {
+	return service.UserRepository.FindUserFollows(userID)
+}
+
+// FindUserFollowing retrieves the users who follow a given user.
+// It delegates the operation to the repository layer to fetch
+// the followers from the database.
+func (service UserService) FindUserFollowing(userID uint64) ([]models.User, error) {
+	return service.UserRepository.FindUserFollowing(userID)
+}

@@ -212,3 +212,72 @@ func (repository UserRepository) UnfollowUser(followID, userID uint64) error {
 	return nil
 }
 
+// FindUserFollows retrieves the users that a given user is following.
+// It returns a slice of users followed by the specified user ID,
+// or an error if the query execution fails.
+func (repository UserRepository) FindUserFollows(userID uint64) ([]models.User, error) {
+	rows, err := repository.db.Query(`
+		SELECT id, name, username, email, created_at
+		FROM users u
+		INNER JOIN follows f ON u.id = f.follow_id
+		WHERE f.user_id = $1
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []models.User
+	for rows.Next() {
+		var user models.User
+
+		err = rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Username,
+			&user.Email,
+			&user.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+// FindUserFollowing retrieves the users who follow a given user.
+// It returns a slice of users that follow the specified user ID,
+// or an error if the query execution fails.
+func (repository UserRepository) FindUserFollowing(userID uint64) ([]models.User, error) {
+	rows, err := repository.db.Query(`
+		SELECT id, name, username, email, created_at
+		FROM users u
+		INNER JOIN follows f ON u.id = f.user_id
+		WHERE f.follow_id = $1
+	`, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var users []models.User
+	for rows.Next() {
+		var user models.User
+
+		err = rows.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Username,
+			&user.Email,
+			&user.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}

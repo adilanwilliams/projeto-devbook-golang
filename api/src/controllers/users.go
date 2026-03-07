@@ -245,3 +245,60 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		Success: true,
 	})
 }
+
+// FindUserFollows retrieves the users that a given user is following.
+func FindUserFollows(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	userID, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	service, err := services.NewUserService()
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	users, err := service.FindUserFollows(userID)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusOK, response.Response{
+		Success: true,
+		Data:    users,
+	})
+}
+
+// FindUserFollowing retrieves the users who follow the user identified
+// by userId in the request URL. 
+func FindUserFollowing(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	userID, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	service, err := services.NewUserService()
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	users, err := service.FindUserFollowing(userID)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusOK, response.Response{
+		Success: true,
+		Data:    users,
+	})
+}
