@@ -1,14 +1,15 @@
 package middlewares
 
 import (
+	"context"
 	"devbook/src/authentication"
 	"devbook/src/utils/response"
-	"errors"
 	"net/http"
-	"strconv"
-
-	"github.com/gorilla/mux"
 )
+
+type contextKey string
+
+const userIDKey contextKey = ""
 
 // Authentication validates the token included in the request.
 // If the token is invalid, it responds with HTTP 401 (Unauthorized).
@@ -28,26 +29,21 @@ func Authentication(next http.HandlerFunc) http.HandlerFunc {
 // and checks whether it matches the user ID from the validated token.
 func AuthenticationUserID(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		params := mux.Vars(r)
-
-		userID, err := strconv.ParseUint(params["userId"], 10, 64)
-		if err != nil {
-			response.ResponseError(w, http.StatusBadRequest, err)
-			return
-		}
-
 		userIDToken, err := authentication.ExtractUserID(r)
 		if err != nil {
 			response.ResponseError(w, http.StatusUnauthorized, err)
 			return
 		}
 
-		if userID != userIDToken {
-			err := errors.New("Invalid userID.")
-			response.ResponseError(w, http.StatusForbidden, err)
-			return
-		}
+		context := context.WithValue(r.Context(), "userID", userIDToken)
 
-		next(w, r)
+		/*
+			if userID != userIDToken {
+				err := errors.New("Invalid userID.")
+				response.ResponseError(w, http.StatusForbidden, err)
+				return
+			} */
+
+		next(w, r.WithContext(context))
 	}
 }

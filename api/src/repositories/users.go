@@ -173,3 +173,24 @@ func (repository UserRepository) FindByEmail(email string) (models.User, error) 
 
 	return user, nil
 }
+
+// FollowUser creates a follow relationship between two users.
+// It inserts a record into the follows table using the ID of the
+// follower (userID) and the ID of the user being followed (followID).
+// It returns an error if the insert operation fails.
+func (repository UserRepository) FollowUser(followID, userID uint64) error {
+	statment, err := repository.db.Prepare(
+		"INSERT IGNORE INTO follows (user_id, follow_id) VALUES ($1, $2);",
+	)
+	if err != nil {
+		return err
+	}
+	defer statment.Close()
+
+	_, err = statment.Exec(userID, followID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

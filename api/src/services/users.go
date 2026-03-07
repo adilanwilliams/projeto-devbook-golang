@@ -111,3 +111,16 @@ func (service UserService) Login(password, email string) (uint64, error) {
 
 	return user.ID, nil
 }
+
+
+// FollowUser creates a follow relationship between two users.
+// It delegates the operation to the repository layer to persist
+// the relationship in the database.
+func (service UserService) FollowUser(followID, userID uint64) error {
+	err := service.UserRepository.FollowUser(followID, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

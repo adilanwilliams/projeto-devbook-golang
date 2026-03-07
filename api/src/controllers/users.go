@@ -5,6 +5,7 @@ import (
 	"devbook/src/services"
 	"devbook/src/utils/response"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -55,6 +56,12 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	followID := r.Context().Value("userID").(uint64)
+	if followID != userID {
+		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
+		return
+	}
+
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		response.ResponseError(w, http.StatusUnprocessableEntity, err)
@@ -95,6 +102,12 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	userID, err := strconv.ParseUint(params["userId"], 10, 64)
 	if err != nil {
 		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	followID := r.Context().Value("userID").(uint64)
+	if followID != userID {
+		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
 		return
 	}
 
@@ -165,4 +178,38 @@ func FindUserByNameOrUsername(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// FollowUser creates a follow relationship between the authenticated user
+// and the user identified by userId in the request URL.
+// It prevents a user from following themselves and returns an error
+// if the operation fails.
+func FollowUser(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
 
+	userID, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	followID := r.Context().Value("userID").(uint64)
+	if followID == userID {
+		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
+		return
+	}
+
+	service, err := services.NewUserService()
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	err = service.FollowUser(followID, userID)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusNoContent, response.Response{
+		Success: true,
+	})
+}

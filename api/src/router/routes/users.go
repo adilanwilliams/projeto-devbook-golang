@@ -36,4 +36,10 @@ var usersRoutes = []Route{
 		Handler:        controllers.FindUserByNameOrUsername,
 		Authentication: false,
 	},
+	{
+		URL:            "/users/{userId}/follow",
+		Method:         http.MethodPost,
+		Handler:        controllers.FollowUser,
+		Authentication: true,
+	},
 }
