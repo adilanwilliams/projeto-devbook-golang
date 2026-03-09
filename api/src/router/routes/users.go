@@ -60,4 +60,10 @@ var usersRoutes = []Route{
 		Handler:        controllers.FindUserFollowing,
 		Authentication: false,
 	},
+	{
+		URL:            "/user/{userId}/change-password",
+		Method:         http.MethodPost,
+		Handler:        controllers.ChangePassword,
+		Authentication: true,
+	},
 }

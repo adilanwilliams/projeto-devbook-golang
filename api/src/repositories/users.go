@@ -225,6 +225,7 @@ func (repository UserRepository) FindUserFollows(userID uint64) ([]models.User, 
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	var users []models.User
 	for rows.Next() {
@@ -260,6 +261,7 @@ func (repository UserRepository) FindUserFollowing(userID uint64) ([]models.User
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close()
 
 	var users []models.User
 	for rows.Next() {
@@ -280,4 +282,41 @@ func (repository UserRepository) FindUserFollowing(userID uint64) ([]models.User
 	}
 
 	return users, nil
+}
+
+// ChangePassword updates the password of a user identified by its unique ID.
+// It stores the new hashed password in the database and returns an error
+// if the update operation fails.
+func (repository UserRepository) ChangePassword(userID uint64, password string) error {
+	statement, err := repository.db.Prepare(
+		"UPDATE users SET password = $1 WHERE id = $2",
+	)
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	_, err = statement.Exec(password, userID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetPassword retrieves the hashed password of a user by its unique ID.
+// It returns the password string if found, or an error if the query fails.
+func (repository UserRepository) GetPassword(userID uint64) (string, error) {
+	var password string
+
+	err := repository.db.QueryRow(
+		"SELECT password FROM users WHERE id = $1",
+		userID,
+	).Scan(&password)
+
+	if err != nil {
+		return "", err
+	}
+
+	return password, nil
 }

@@ -101,7 +101,7 @@ func (service UserService) Login(password, email string) (uint64, error) {
 	}
 
 	if user.IsEmpty() {
-		return 0, errors.New("Access invalid.")
+		return 0, errors.New("E-mail is invalid.")
 	}
 
 	err = security.ValidatePassword(user.Password, password)
@@ -134,4 +134,26 @@ func (service UserService) FindUserFollows(userID uint64) ([]models.User, error)
 // the followers from the database.
 func (service UserService) FindUserFollowing(userID uint64) ([]models.User, error) {
 	return service.UserRepository.FindUserFollowing(userID)
+}
+
+// ChangePassword updates the password of a user after validating the current password.
+// It retrieves the stored password, compares it with the provided current password,
+// hashes the new password, and then updates it in the database.
+func (service UserService) ChangePassword(userID uint64, password models.UserPassword) error {
+	currentPasswordSaveOnDB, err := service.UserRepository.GetPassword(userID)
+	if err != nil {
+		return err
+	}
+
+	err = security.ValidatePassword(currentPasswordSaveOnDB, password.Current)
+	if err != nil {
+		return err
+	}
+
+	passwordHashed, err := security.Hash(password.New)
+	if err != nil {
+		return err
+	}
+	
+	return service.UserRepository.ChangePassword(userID, string(passwordHashed))
 }

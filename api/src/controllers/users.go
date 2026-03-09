@@ -56,8 +56,8 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	followID := r.Context().Value("userID").(uint64)
-	if followID != userID {
+	userToken := r.Context().Value("userID").(uint64)
+	if userToken != userID {
 		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
 		return
 	}
@@ -105,8 +105,8 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	followID := r.Context().Value("userID").(uint64)
-	if followID != userID {
+	userToken := r.Context().Value("userID").(uint64)
+	if userToken != userID {
 		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
 		return
 	}
@@ -275,7 +275,7 @@ func FindUserFollows(w http.ResponseWriter, r *http.Request) {
 }
 
 // FindUserFollowing retrieves the users who follow the user identified
-// by userId in the request URL. 
+// by userId in the request URL.
 func FindUserFollowing(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
@@ -300,5 +300,53 @@ func FindUserFollowing(w http.ResponseWriter, r *http.Request) {
 	response.ResponseJSON(w, http.StatusOK, response.Response{
 		Success: true,
 		Data:    users,
+	})
+}
+
+// ChangePassword updates the password of the authenticated user.
+// It validates that the user making the request matches the userId
+// in the URL, reads the current and new passwords from the request body,
+// and delegates the update process to the service layer.
+func ChangePassword(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	userID, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	userToken := r.Context().Value("userID").(uint64)
+	if userToken != userID {
+		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		response.ResponseError(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	var password models.UserPassword
+	if err = json.Unmarshal(body, &password); err != nil{
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	service, err := services.NewUserService()
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	err = service.ChangePassword(userID, password)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusOK, response.Response{
+		Success: true,
 	})
 }
