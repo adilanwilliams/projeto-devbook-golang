@@ -25,6 +25,12 @@ func NewPostService() (*PostService, error) {
 
 // SavePost creates a new post in the database and returns the generated ID.
 // It returns an error if the operation fails.
-func (service PostService) SavePost(post models.Post, userID uint64) (uint64, error) {
-	return service.PostRepository.Save(post, userID)
+func (service PostService) SavePost(post models.Post,) (uint64, error) {
+	err := post.Prepare()
+	if err != nil {
+		return 0, err
+	}
+
+	return service.PostRepository.Save(post)
 }
+
