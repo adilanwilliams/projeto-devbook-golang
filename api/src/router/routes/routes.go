@@ -23,6 +23,8 @@ func Bootstrap(router *mux.Router) *mux.Router {
 	var routes []Route
 
 	routes = append(routes, usersRoutes...)
+	routes = append(routes, postsRoutes...)
+	
 	routes = append(routes, loginRoute)
 
 	for _, route := range routes {

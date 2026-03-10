@@ -7,7 +7,7 @@ import (
 
 var usersRoutes = []Route{
 	{
-		URL:            "/user/create",
+		URL:            "/user/save",
 		Method:         http.MethodPost,
 		Handler:        controllers.SaveUser,
 		Authentication: false,

@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"devbook/src/authentication"
 	"devbook/src/models"
 	"devbook/src/services"
 	"devbook/src/utils/response"
@@ -56,7 +57,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userToken := r.Context().Value("userID").(uint64)
+	userToken := r.Context().Value(authentication.UserIDToken).(uint64)
 	if userToken != userID {
 		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
 		return
@@ -105,7 +106,7 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userToken := r.Context().Value("userID").(uint64)
+	userToken := r.Context().Value(authentication.UserIDToken).(uint64)
 	if userToken != userID {
 		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
 		return
@@ -189,7 +190,7 @@ func FollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	followID := r.Context().Value("userID").(uint64)
+	followID := r.Context().Value(authentication.UserIDToken).(uint64)
 	if followID == userID {
 		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
 		return
@@ -223,7 +224,7 @@ func UnfollowUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	followID := r.Context().Value("userID").(uint64)
+	followID := r.Context().Value(authentication.UserIDToken).(uint64)
 	if followID == userID {
 		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
 		return
@@ -316,7 +317,7 @@ func ChangePassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	userToken := r.Context().Value("userID").(uint64)
+	userToken := r.Context().Value(authentication.UserIDToken).(uint64)
 	if userToken != userID {
 		response.ResponseError(w, http.StatusForbidden, errors.New("Invalid userID"))
 		return
