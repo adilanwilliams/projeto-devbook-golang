@@ -34,3 +34,6 @@ func (service PostService) SavePost(post models.Post,) (uint64, error) {
 	return service.PostRepository.Save(post)
 }
 
+func (service PostService) FindPostByID(postID uint64) (models.Post, error) {
+	return service.PostRepository.FindPostByID(postID)
+}

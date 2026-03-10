@@ -39,15 +39,9 @@ func (u *User) Prepare(mode string) error {
 	return nil
 }
 
-func (u *User) IsEmpty() bool {
-	if u.ID == 0 &&
-		u.Name == "" &&
-		u.Username == "" &&
-		u.Email == "" &&
-		u.Password == "" {
-			return true
-	}
-	return false
+// IsEmpty checks whether the user struct is empty.
+func (u User) IsEmpty() bool {
+	return u == (User{})
 }
 
 func (u User) validate(mode string) error {

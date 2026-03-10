@@ -25,7 +25,7 @@ var usersRoutes = []Route{
 		Authentication: true,
 	},
 	{
-		URL:            "/user/{userId}/detail",
+		URL:            "/user/{userId}",
 		Method:         http.MethodGet,
 		Handler:        controllers.FindUserByID,
 		Authentication: false,

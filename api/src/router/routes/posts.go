@@ -12,4 +12,10 @@ var postsRoutes = []Route{
 		Handler:        controllers.SavePost,
 		Authentication: true,
 	},
+	{
+		URL:            "/post/{postId}",
+		Method:         http.MethodGet,
+		Handler:        controllers.FindPostByID,
+		Authentication: true,
+	},
 }
