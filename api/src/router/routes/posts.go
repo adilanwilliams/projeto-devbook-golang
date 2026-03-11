@@ -18,4 +18,10 @@ var postsRoutes = []Route{
 		Handler:        controllers.FindPostByID,
 		Authentication: true,
 	},
+	{
+		URL:            "/posts/feed",
+		Method:         http.MethodGet,
+		Handler:        controllers.FindUserFeed,
+		Authentication: true,
+	},
 }

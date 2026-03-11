@@ -68,31 +68,42 @@ func (repository PostRepository) FindPostByID(postID uint64) (models.Post, error
 	return post, nil
 }
 
-// func (repository PostRepository) FindPostByID(postID uint64) (models.Post, error) {
-// 	rows, err := repository.db.Query(
-// 		`SELECT 
-// 		title, content, author_id, likes, created_at 
-// 		FROM posts WHERE id = $1`,
-// 		postID,
-// 	)
-// 	if err != nil {
-// 		return models.Post{}, err
-// 	}
-// 	defer rows.Close()
+// FindUserFeed returns the posts created by the user and by the users they follow.
+// It retrieves the feed ordered by the most recent posts.
+func (repository PostRepository) FindUserFeed(userID uint64) ([]models.Post, error) {
+	rows, err := repository.db.Query(
+		`SELECT DISTINCT p.*, u.username FROM posts p 
+		INNER JOIN users u ON u.id = p.author_id 
+		INNER JOIN follows f ON p.author_id = f.user_id 
+		WHERE u.id = $1 or f.follow_id = $1
+		ORDER BY p.created_at`,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
 
-// 	var post models.Post
-// 	if rows.Next() {
-// 		err = rows.Scan(
-// 			&post.Title,
-// 			&post.Content,
-// 			&post.AuthorID,
-// 			&post.Likes,
-// 			&post.CreatedAt,
-// 		)
-// 		if err != nil {
-// 			return models.Post{}, err
-// 		}
-// 	}
+	var posts []models.Post
 
-// 	return post, nil
-// }
+	for rows.Next() {
+		var post models.Post
+
+		err = rows.Scan(
+			&post.ID,
+			&post.Title,
+			&post.AuthorID,
+			&post.Content,
+			&post.Likes,
+			&post.CreatedAt,
+			&post.Author,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
