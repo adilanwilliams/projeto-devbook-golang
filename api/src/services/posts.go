@@ -65,3 +65,7 @@ func (service PostService) FindPostsByUser(userID uint64) ([]models.Post, error)
 func (service PostService) LikePost(postID uint64) error {
 	return service.PostRepository.LikePost(postID)
 }
+
+func (service PostService) UnlikePost(postID uint64) error {
+	return service.PostRepository.UnlikePost(postID)
+}

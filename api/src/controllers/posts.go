@@ -236,3 +236,27 @@ func LikePost(w http.ResponseWriter, r *http.Request) {
 
 	response.ResponseJSON(w, http.StatusNoContent, response.Response{})
 }
+
+func UnlikePost(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	postID, err := strconv.ParseUint(params["postId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	service, err := services.NewPostService()
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	err = service.UnlikePost(postID)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusNoContent, response.Response{})
+}

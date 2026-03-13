@@ -201,3 +201,24 @@ func (repository PostRepository) LikePost(postID uint64) error {
 
 	return nil
 }
+
+func (repository PostRepository) UnlikePost(postID uint64) error {
+	stetement, err := repository.db.Prepare(
+		`UPDATE posts SET likes = 
+		CASE WHEN likes > 0 THEN likes -1
+		ELSE likes END
+		WHERE id = $1`,
+	)
+	if err != nil {
+		return err
+	}
+	defer stetement.Close()
+
+	_, err = stetement.Exec(postID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
