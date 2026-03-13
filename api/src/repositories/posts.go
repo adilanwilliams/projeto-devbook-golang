@@ -144,5 +144,43 @@ func (repository PostRepository) DeletePost(postID uint64) error {
 	}
 
 	return nil
+}
+
+// FindPostsByUser returns all posts created by a specific user.
+// It retrieves the posts along with the author's username from the database
+// based on the provided user ID.
+func (repository PostRepository) FindPostsByUser(userID uint64) ([]models.Post, error) {
+	rows, err := repository.db.Query(
+		`SELECT p.*, u.username from posts p
+		join users u on u.id = p.author_id 
+		where p.author_id = $1`,
+		userID,
+	)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var posts []models.Post
+
+	for rows.Next() {
+		var post models.Post
+		err = rows.Scan(
+			&post.ID,
+			&post.Title,
+			&post.AuthorID,
+			&post.Content,
+			&post.Likes,
+			&post.CreatedAt,
+			&post.Author,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	return posts, nil
 
 }

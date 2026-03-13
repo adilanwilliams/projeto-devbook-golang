@@ -54,3 +54,10 @@ func (service PostService) UpdatePost(post models.Post) error {
 func (service PostService) DeletePost(postID uint64) error {
 	return service.PostRepository.DeletePost(postID)
 }
+
+// FindPostsByUser returns all posts created by a specific user.
+// It retrieves the posts along with the author's username from the database
+// based on the provided user ID.
+func (service PostService) FindPostsByUser(userID uint64) ([]models.Post, error) {
+	return service.PostRepository.FindPostsByUser(userID)
+}

@@ -182,3 +182,33 @@ func DeletePost(w http.ResponseWriter, r *http.Request) {
 
 	response.ResponseJSON(w, http.StatusNoContent, response.Response{})
 }
+
+// FindPostsByUser handles the request to retrieve all posts created by a specific user.
+// It reads the user ID from the request parameters and returns the user's posts in JSON format.
+func FindPostsByUser(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	userID, err := strconv.ParseUint(params["userId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	service, err := services.NewPostService()
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	posts, err := service.FindPostsByUser(userID)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusOK, response.Response{
+		Success: true,
+		Data: posts,
+	})
+
+}
