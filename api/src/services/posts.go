@@ -62,10 +62,12 @@ func (service PostService) FindPostsByUser(userID uint64) ([]models.Post, error)
 	return service.PostRepository.FindPostsByUser(userID)
 }
 
+// LikePost adds a like to the specified post.
 func (service PostService) LikePost(postID uint64) error {
 	return service.PostRepository.LikePost(postID)
 }
 
+// UnlikePost removes a like from the specified post.
 func (service PostService) UnlikePost(postID uint64) error {
 	return service.PostRepository.UnlikePost(postID)
 }

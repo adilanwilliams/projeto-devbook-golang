@@ -213,6 +213,8 @@ func FindPostsByUser(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// LikePost handles the request to add a like to a post.
+// It reads the post ID from the URL parameters and increments the post's like count.
 func LikePost(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
@@ -237,6 +239,8 @@ func LikePost(w http.ResponseWriter, r *http.Request) {
 	response.ResponseJSON(w, http.StatusNoContent, response.Response{})
 }
 
+// UnlikePost handles the request to remove a like from a post.
+// It reads the post ID from the URL parameters and decrements the post's like count.
 func UnlikePost(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 

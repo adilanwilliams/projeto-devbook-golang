@@ -185,6 +185,7 @@ func (repository PostRepository) FindPostsByUser(userID uint64) ([]models.Post, 
 
 }
 
+// LikePost increments the number of likes for the specified post.
 func (repository PostRepository) LikePost(postID uint64) error {
 	stetement, err := repository.db.Prepare(
 		`UPDATE posts SET likes = likes + 1 WHERE id = $1`,
@@ -202,6 +203,8 @@ func (repository PostRepository) LikePost(postID uint64) error {
 	return nil
 }
 
+// UnlikePost decrements the number of likes for the specified post.
+// The number of likes will not go below zero.
 func (repository PostRepository) UnlikePost(postID uint64) error {
 	stetement, err := repository.db.Prepare(
 		`UPDATE posts SET likes = 
