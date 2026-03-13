@@ -61,3 +61,7 @@ func (service PostService) DeletePost(postID uint64) error {
 func (service PostService) FindPostsByUser(userID uint64) ([]models.Post, error) {
 	return service.PostRepository.FindPostsByUser(userID)
 }
+
+func (service PostService) LikePost(postID uint64) error {
+	return service.PostRepository.LikePost(postID)
+}
