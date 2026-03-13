@@ -44,3 +44,13 @@ func (service PostService) FindPostByID(postID uint64) (models.Post, error) {
 func (service PostService) FindUserFeed(userID uint64) ([]models.Post, error) {
 	return service.PostRepository.FindUserFeed(userID)
 }
+
+// UpdatePost updates an existing post's information.
+func (service PostService) UpdatePost(post models.Post) error {
+	return service.PostRepository.UpdatePost(post)
+}
+
+// DeletePost removes a post from the database by its ID.
+func (service PostService) DeletePost(postID uint64) error {
+	return service.PostRepository.DeletePost(postID)
+}

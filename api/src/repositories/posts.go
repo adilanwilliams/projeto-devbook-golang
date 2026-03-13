@@ -107,3 +107,42 @@ func (repository PostRepository) FindUserFeed(userID uint64) ([]models.Post, err
 
 	return posts, nil
 }
+
+// UpdatePost updates the title and of an existing user.
+// It returns an error if the update operation fails.
+func (repository PostRepository) UpdatePost(post models.Post) error {
+	stetment, err := repository.db.Prepare(
+		`UPDATE posts SET title = $1, content = $2 WHERE id = $3`,
+	)
+	if err != nil {
+		return err
+	}
+	defer stetment.Close()
+
+	_, err = stetment.Exec(post.Title, post.Content, post.ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// DeletePost removes a post from the database based on its ID.
+// It returns an error if the delete operation fails.
+func (repository PostRepository) DeletePost(postID uint64) error {
+	stetment, err := repository.db.Prepare(
+		`DELETE FROM posts WHERE id = $1`,
+	)
+	if err != nil {
+		return err
+	}
+	defer stetment.Close()
+
+	_, err = stetment.Exec(postID)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
+}

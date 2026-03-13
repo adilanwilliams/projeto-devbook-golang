@@ -6,6 +6,7 @@ import (
 	"devbook/src/services"
 	"devbook/src/utils/response"
 	"encoding/json"
+	"errors"
 	"io"
 	"net/http"
 	"strconv"
@@ -73,13 +74,13 @@ func FindPostByID(w http.ResponseWriter, r *http.Request) {
 
 	response.ResponseJSON(w, http.StatusOK, response.Response{
 		Success: true,
-		Data: post,
+		Data:    post,
 	})
 }
 
 // FindUserFeed handles the request to retrieve the authenticated user's feed.
 // The feed includes posts created by the user and by the users they follow.
-func FindUserFeed(w http.ResponseWriter, r *http.Request){
+func FindUserFeed(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(authentication.UserIDToken).(uint64)
 
 	service, err := services.NewPostService()
@@ -96,6 +97,88 @@ func FindUserFeed(w http.ResponseWriter, r *http.Request){
 
 	response.ResponseJSON(w, http.StatusOK, response.Response{
 		Success: true,
-		Data: posts,
+		Data:    posts,
 	})
+}
+
+// UpdateUser handles the update of an existing user identified by postId.
+func UpdatePost(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value(authentication.UserIDToken).(uint64)
+	params := mux.Vars(r)
+
+	postID, err := strconv.ParseUint(params["postId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	service, err := services.NewPostService()
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	post, err := service.FindPostByID(postID)
+
+	if post.AuthorID != userID {
+		err = errors.New("you are not allowed to update another user's post")
+		response.ResponseError(w, http.StatusForbidden, err)
+		return
+	}
+
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		response.ResponseError(w, http.StatusUnprocessableEntity, err)
+		return
+	}
+
+	if err := json.Unmarshal(body, &post); err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	post.ID = postID
+
+	err = service.UpdatePost(post)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusOK, response.Response{})
+
+}
+
+// DeletePost handles the removal of a post identified by postId.
+func DeletePost(w http.ResponseWriter, r *http.Request) {
+	userID := r.Context().Value(authentication.UserIDToken).(uint64)
+	params := mux.Vars(r)
+
+	postID, err := strconv.ParseUint(params["postId"], 10, 64)
+	if err != nil {
+		response.ResponseError(w, http.StatusBadRequest, err)
+		return
+	}
+
+	service, err := services.NewPostService()
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	post, err := service.FindPostByID(postID)
+
+	if post.AuthorID != userID {
+		err = errors.New("you are not allowed to delete another user's post")
+		response.ResponseError(w, http.StatusForbidden, err)
+		return
+	}
+
+	err = service.DeletePost(postID)
+	if err != nil {
+		response.ResponseError(w, http.StatusInternalServerError, err)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusNoContent, response.Response{})
 }

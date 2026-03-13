@@ -24,4 +24,16 @@ var postsRoutes = []Route{
 		Handler:        controllers.FindUserFeed,
 		Authentication: true,
 	},
+	{
+		URL:            "/post/{postId}/update",
+		Method:         http.MethodPut,
+		Handler:        controllers.UpdatePost,
+		Authentication: true,
+	},
+	{
+		URL:            "/post/{postId}/delete",
+		Method:         http.MethodDelete,
+		Handler:        controllers.DeletePost,
+		Authentication: true,
+	},
 }
